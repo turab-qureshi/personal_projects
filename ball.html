@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>
+      Javascript Test
+    </title>
+    <style>
+      body{
+        background: url('bg.jpg');
+      }
+    </style>
+  </head>
+  <body onload='move()'>
+    <div id='main' style='width:100%; height:97vh; text-align: center;'>
+      <p style="font-size: 30px; margin: 0;">catch the ball two times within 5 second to win</p>
+      <div id='ball' style='position:absolute; left:50%; top:50%;' onclick='change_position()'>
+        <img src='ball.png' width='50px' />
+      </div>
+    </div>
+    <script type='text/javascript'>
+      var l = 1;
+      var t = 1;
+      var limit = 0;
+      function change_position(){
+        if(limit == 1){alert("You Win");}
+        if(limit == 0){limit = 1;}
+        setTimeout(function(){limit = 0;}, 5000);
+        var wid = parseInt(document.getElementById('main').offsetWidth) - 50;
+        var hei = parseInt(document.getElementById('main').offsetHeight) - 50;
+        var left_pos = Math.floor((Math.random() * wid) + 1);
+        var top_pos = Math.floor((Math.random() * hei) + 1);
+        document.getElementById('ball').style.position = 'absolute';
+        document.getElementById('ball').style.left = left_pos+"px";
+        document.getElementById('ball').style.top = top_pos+"px";
+        if(l == 1){l = 0;}else{l = 1;}
+        if(t == 1){t = 0;}else{t = 1;}
+      }
+      function move(){
+        setInterval(function(){
+          var le = parseInt(document.getElementById('ball').style.left);
+          var to = parseInt(document.getElementById('ball').style.top);
+          var wid = parseInt(document.getElementById('main').offsetWidth) - 20;
+          var hei = parseInt(document.getElementById('main').offsetHeight) - 10;
+          if(le >= wid){l = 0;}
+          if(to >= hei){t = 0;}
+          if(le <= 0){l = 1;}
+          if(to <= 0){t = 1;}
+          if(l == 1){left_pos = le + 1;}
+          if(l == 0){left_pos = le - 1;}
+          if(t == 1){top_pos = to + 1;}
+          if(t == 0){top_pos = to - 1;}
+          document.getElementById('ball').style.position = 'absolute';
+          document.getElementById('ball').style.left = left_pos+"px";
+          document.getElementById('ball').style.top = top_pos+"px";
+        },1);
+      }
+    </script>
+  </body>
+</html>
