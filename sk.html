@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html manifest=sketch.manifest>
+  <head>
+    <meta charset=utf-8>
+    <title>Sketch</title>
+    <meta name=apple-mobile-web-app-capable content=yes>
+    <meta name=apple-mobile-web-app-status-bar-style content=black>
+    <meta name=viewport content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, minimal-ui">
+    <style>
+      html, body, svg {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        background: #222;
+        overflow: hidden;
+        cursor: none;
+        position: fixed;
+      }
+      svg {
+        position: relative;
+        background: white;
+      }
+      nav {
+        display: block;
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+      }
+      #cursor, div {
+        display: block;
+        width: 5px;
+        height: 5px;
+        border-radius: 100%;
+        background: black;
+        position: absolute;
+        opacity: .5;
+        pointer-events: none;
+        transition: opacity .1s ease-in-out;
+      }
+    </style>
+  </head>
+  <body>
+    <svg xmlns=http://www.w3.org/2000/svg version=1.1></svg>
+    <nav>
+      Color: <input id=color type=color value=#000000 style="width:75px;height:21px;" onchange="cursor.style.background=brush=this.value;">
+      Width: <input id=width type=number min=1 value=5 style="width:55px" oninput="radius=this.value/2;cursor.style.width=this.value+'px';cursor.style.height=this.value+'px'">
+      <input type=button onclick=clean() value=clear>
+    </nav>
+    <div id=cursor></div>
+    <script>
+      var board = document.getElementsByTagName('svg')[0];
+      var cursor = document.getElementById('cursor');
+      var gesture = false;
+      var line = '';
+      var brush = 'black';
+      var radius = 2.5;
+      if (localStorage.svg){
+        document.body.removeChild(board)
+        document.getElementsByTagName('nav')[0].insertAdjacentHTML('beforebegin', localStorage.svg)
+        board = document.getElementsByTagName('svg')[0]
+      }
+      // Start
+      board.addEventListener('mousedown',lineStart)
+      board.addEventListener('touchstart',lineStart)
+      function lineStart(e){
+        line = 'M'+(e.clientX||e.touches[0].clientX)+','+(e.clientY||e.touches[0].clientY)+' '
+        cursor.style.opacity = 1
+        gesture = true
+        e.preventDefault()
+      }
+      // Move
+      board.addEventListener('mousemove',lineMove)
+      board.addEventListener('touchmove',lineMove)
+      function lineMove(e){
+        if (gesture == true){
+          line += 'L'+(e.clientX||e.touches[0].clientX)+','+(e.clientY||e.touches[0].clientY)+' '
+          trace((e.clientX||e.touches[0].clientX),(e.clientY||e.touches[0].clientY))
+        }
+        cursor.style.top = e.clientY-radius+'px'
+        cursor.style.left = e.clientX-radius+'px'
+      }
+      // End
+      board.addEventListener('mouseup',lineEnd)
+      board.addEventListener('touchend',lineEnd)
+      function lineEnd(e){
+        line += 'L'+(e.clientX||e.changedTouches[0].clientX)+','+(e.clientY||e.changedTouches[0].clientY)
+        cursor.style.opacity = .5
+        var path = document.createElementNS('http://www.w3.org/2000/svg','path')
+        path.setAttributeNS(null,'d',line)
+        path.setAttributeNS(null,'fill','none')
+        path.setAttributeNS(null,'stroke-linecap','round')
+        path.setAttributeNS(null,'stroke',document.getElementById('color').value)
+        path.setAttributeNS(null,'stroke-width',document.getElementById('width').value)
+        board.appendChild(path)
+        board.innerHTML = board.innerHTML // force SVG repaint after DOM change
+        gesture = false
+        localStorage.svg = new XMLSerializer().serializeToString(board)
+      }
+      function clean(){
+        if(window.confirm('Would you like to clear the sketch?','')===true){
+          var paths = board.querySelectorAll('path').length
+          for (i=0;i<paths;i++){
+            board.removeChild(board.querySelectorAll('path')[0])
+          }
+          localStorage.svg = ''
+        }
+      }
+      function trace(x,y){
+        var dot = document.createElement('div');
+        dot.style.top = y-radius+'px'
+        dot.style.left = x-radius+'px'
+        dot.style.background = brush
+        dot.style.width = dot.style.height = radius*2+'px'
+        document.body.appendChild(dot)
+        setTimeout(function(){dot.style.opacity=0},500)
+        setTimeout(function(){document.body.removeChild(dot)},1000)
+      }
+    </script>
+  </body>
+</html>

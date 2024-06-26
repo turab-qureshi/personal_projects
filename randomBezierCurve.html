@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Random Bezier Curve</title>
+    <link rel="icon" type="image/png" href="fav.png">
+    <style>
+      @font-face {
+        font-family: fingerpaint;
+        src: url('fingerpaint.ttf');
+      }
+      body {
+        font-family: fingerpaint;
+      }
+    </style>
+  </head>
+  <body onload="anim()">
+    <canvas id="myCanvas" width="2000" height="1000" style="width: 100%; height: 95vh; border:1px solid grey;"></canvas>
+    <script>
+      var canvas = document.getElementById("myCanvas");
+      var wid = 2000;
+      var hei = 1000;
+
+      var ctx = canvas.getContext("2d");
+      ctx.lineWidth = 5;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(wid/2 , hei/2);
+      function anim() {
+        var x1 = Math.random() * wid;
+        var y1 = Math.random() * hei;
+        var x2 = Math.random() * wid;
+        var y2 = Math.random() * hei;
+        var x3 = Math.random() * wid;
+        var y3 = Math.random() * hei;
+        var i = 0;
+        setInterval(function() {
+          if (i == 5) {
+            ctx.closePath();
+            ctx.beginPath();
+            ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+            ctx.fillRect(0, 0, wid, hei);
+            ctx.stroke();
+            ctx.closePath();
+            ctx.beginPath();
+            i = 0;
+          }
+          ctx.bezierCurveTo(x1, y1, x2, y2, x3, y3);
+          //ctx.arcTo(x1, y1, x2, y2, 100);
+          ctx.stroke();
+          x1 = Math.random() * wid;
+          y1 = Math.random() * hei;
+          x2 = Math.random() * wid;
+          y2 = Math.random() * hei;
+          x3 = Math.random() * wid;
+          y3 = Math.random() * hei;
+          i++;
+        }, 100);
+      }
+    </script>
+  </body>
+</html>
